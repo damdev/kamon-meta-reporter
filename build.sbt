@@ -3,7 +3,8 @@ resolvers += Resolver.bintrayRepo("kamon-io", "snapshots")
 lazy val root = (project in file("."))
   .settings(
     organization := "io.kamon",
-    name := "kamon-meta-reporter")
+    name := "kamon-meta-reporter",
+    crossScalaVersions := Seq("2.11.11", "2.12.7"))
   .settings(
     libraryDependencies ++= Seq(
       "io.kamon"      %% "kamon-core"   % "1.2.0-M1",

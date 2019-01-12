@@ -89,7 +89,7 @@ object MetaReporter {
       MetaReporter.Configuration(
         startEmbeddedServer = metaReporterConfig.getBoolean("start-embedded-http-server"),
         embeddedServerHostname = metaReporterConfig.getString("embedded-server.hostname"),
-        embeddedServerPort = metaReporterConfig.getInt("embedded-server.port"),
+        embeddedServerPort = metaReporterConfig.getInt("embedded-server.port")
       )
     }
 

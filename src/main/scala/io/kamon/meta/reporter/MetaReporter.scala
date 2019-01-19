@@ -2,7 +2,7 @@ package io.kamon.meta.reporter
 
 import java.io.IOException
 
-import com.grack.nanojson.{JsonStringWriter, JsonWriter}
+import com.grack.nanojson.{JsonParser, JsonStringWriter, JsonWriter}
 import com.typesafe.config.{Config, ConfigUtil}
 import fi.iki.elonen.NanoHTTPD
 import fi.iki.elonen.NanoHTTPD._
@@ -52,10 +52,10 @@ class MetaReporter extends Module {
 object MetaReporter {
 
   def scrapeData: String = {
-    val modules = JsonWriter.string.`object`.array("modules")
-    val modulesJson = KanelaInfoProvider.getKanelaModulesInfo.asScala.foldLeft(modules) {
-      (mods: JsonStringWriter, m: (String, java.util.Map[String, java.util.List[String]])) =>
-        addModuleJson(mods.`object`, m)
+    val modules = JsonWriter.string.`object`.value("enabled", KanelaInfoProvider.isKanelaEnabled).`object`("modules")
+    val modulesJson = KanelaInfoProvider.getInstrumentationModulesInfo.asScala.foldLeft(modules) {
+      (mods: JsonStringWriter, m: (String, String)) =>
+        mods.value(m._1, JsonParser.`object`().from(m._2))
     }.end()
     KanelaInfoProvider.getKanelaErrors.asScala.foldLeft(modulesJson.array("errors")) {
       (errs: JsonStringWriter, e: (String, java.util.List[Throwable])) =>
@@ -63,16 +63,6 @@ object MetaReporter {
           (tws: JsonStringWriter, tw: Throwable) => tws.value(tw.getMessage).end
         }
     }.end.end.done()
-  }
-
-  private def addModuleJson(`object`: JsonStringWriter, module: (String, java.util.Map[String, java.util.List[String]])): JsonStringWriter = {
-    val instrumentations = `object`.value("name", module._1).array("instrumentations")
-    module._2.asScala.foldLeft(instrumentations){(inst: JsonStringWriter, i: (String, java.util.List[String])) => addInstrumentationJson(inst.`object`, i)}.end.end
-  }
-
-  private def addInstrumentationJson(`object`: JsonStringWriter, instrumentation: (String, java.util.List[String])): JsonStringWriter = {
-    val types = `object`.value("name", instrumentation._1).array("types")
-    instrumentation._2.asScala.foldLeft(types){(ts: JsonStringWriter, t: String) => ts.value(t)}.end.end
   }
 
   private class EmbeddedHttpServer(val hostname: String, val port: Int) extends NanoHTTPD(hostname, port) {

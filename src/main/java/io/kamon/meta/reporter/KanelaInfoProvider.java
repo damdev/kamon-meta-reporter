@@ -1,20 +1,22 @@
 package io.kamon.meta.reporter;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class KanelaInfoProvider {
-    public static Boolean isKanelaEnabled() {
-        return false;
-    }
+        public static final KanelaInfoProvider MODULE$ = null;
 
-    public static Map<String, String> getInstrumentationModulesInfo() {
-        return Collections.emptyMap();
-    }
+        public Boolean isActive() {
+            return false;
+        }
 
-    public static Map<String, List<Throwable>> getKanelaErrors() {
-        return Collections.emptyMap();
-    }
+        public Map<String, String> modules() {
+            return Collections.emptyMap();
+        }
+
+        public Map<String, java.util.List<Throwable>> errors() {
+            return Collections.emptyMap();
+        }
+
 
 }

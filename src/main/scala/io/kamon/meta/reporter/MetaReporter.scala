@@ -52,12 +52,12 @@ class MetaReporter extends Module {
 object MetaReporter {
 
   def scrapeData: String = {
-    val modules = JsonWriter.string.`object`.value("enabled", KanelaInfoProvider.isKanelaEnabled).`object`("modules")
-    val modulesJson = KanelaInfoProvider.getInstrumentationModulesInfo.asScala.foldLeft(modules) {
+    val modules = JsonWriter.string.`object`.value("enabled", KanelaInfoProvider.MODULE$.isActive).`object`("modules")
+    val modulesJson = KanelaInfoProvider.MODULE$.modules().asScala.foldLeft(modules) {
       (mods: JsonStringWriter, m: (String, String)) =>
         mods.value(m._1, JsonParser.`object`().from(m._2))
     }.end()
-    KanelaInfoProvider.getKanelaErrors.asScala.foldLeft(modulesJson.array("errors")) {
+    KanelaInfoProvider.MODULE$.errors().asScala.foldLeft(modulesJson.array("errors")) {
       (errs: JsonStringWriter, e: (String, java.util.List[Throwable])) =>
         e._2.asScala.foldLeft(errs.`object`.value("type", e._1).array) {
           (tws: JsonStringWriter, tw: Throwable) => tws.value(tw.getMessage).end
